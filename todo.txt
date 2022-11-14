@@ -1,0 +1,12 @@
+Some tasks:
+
+1. Need to refactor code to use FC-100 and CIFAR-FS datasets
+
+2. Need to integrate NC util file for this task
+
+3. Begin running simple experiment:
+3a. Embedding dimension (z-dim) is a hyperparameter looks like - how might this affect collapse?
+
+
+
+
