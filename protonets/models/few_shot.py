@@ -81,4 +81,4 @@ def load_protonet_conv(**kwargs):
         Flatten()
     )
 
-    return Protonet(encoder)
+    return Protonet(encoder)  # Returns an initialized prototypical network to be trained

@@ -19,25 +19,25 @@ import protonets.utils.log as log_utils
 
 def main(opt):
     if not os.path.isdir(opt['log.exp_dir']):
-        os.makedirs(opt['log.exp_dir'])
+        os.makedirs(opt['log.exp_dir'])  # Directory to store the results
 
     # save opts
     with open(os.path.join(opt['log.exp_dir'], 'opt.json'), 'w') as f:
-        json.dump(opt, f)
+        json.dump(opt, f)  # Dump the contents of the argument parsing to a JSON in the 'results' folder
         f.write('\n')
 
     trace_file = os.path.join(opt['log.exp_dir'], 'trace.txt')
 
     # Postprocess arguments
-    opt['model.x_dim'] = list(map(int, opt['model.x_dim'].split(',')))
-    opt['log.fields'] = opt['log.fields'].split(',')
+    opt['model.x_dim'] = list(map(int, opt['model.x_dim'].split(',')))  # Maps input x to list of ints '1,28,28' -> [1, 28, 28]
+    opt['log.fields'] = opt['log.fields'].split(',')  # Fields that are kept track -> Loss, Acc, NC1, NC2, NC3
 
     torch.manual_seed(1234)
     if opt['data.cuda']:
         torch.cuda.manual_seed(1234)
 
     if opt['data.trainval']:
-        data = data_utils.load(opt, ['trainval'])
+        data = data_utils.load(opt, ['trainval'])  # Load dataset
         train_loader = data['trainval']
         val_loader = None
     else:
@@ -45,7 +45,7 @@ def main(opt):
         train_loader = data['train']
         val_loader = data['val']
 
-    model = model_utils.load(opt)
+    model = model_utils.load(opt)  # Loading the model with the related attributes from model registry
 
     if opt['data.cuda']:
         model.cuda()
@@ -54,6 +54,9 @@ def main(opt):
 
     meters = { 'train': { field: tnt.meter.AverageValueMeter() for field in opt['log.fields'] } }
 
+    # TODO: Figure out where metrics are calculated and stored so NC1, 2, 3 can be properly calculated (based on few_shot.py/model)
+    # TODO: Store these in the same way loss, acc are stored -> easy to plot
+
     if val_loader is not None:
         meters['val'] = { field: tnt.meter.AverageValueMeter() for field in opt['log.fields'] }
 
@@ -61,11 +64,11 @@ def main(opt):
         if os.path.isfile(trace_file):
             os.remove(trace_file)
         state['scheduler'] = lr_scheduler.StepLR(state['optimizer'], opt['train.decay_every'], gamma=0.5)
-    engine.hooks['on_start'] = on_start
+    engine.hooks['on_start'] = on_start  # Learning rate scheduler only begins once
 
     def on_start_epoch(state):
-        for split, split_meters in meters.items():
-            for field, meter in split_meters.items():
+        for split, split_meters in meters.items():  # Iterating through train/val
+            for field, meter in split_meters.items():  # Iterating through each calculated meter - loss, acc, NC...
                 meter.reset()
         state['scheduler'].step()
     engine.hooks['on_start_epoch'] = on_start_epoch
@@ -121,10 +124,10 @@ def main(opt):
     engine.hooks['on_end_epoch'] = partial(on_end_epoch, { })
 
     engine.train(
-        model = model,
-        loader = train_loader,
-        optim_method = getattr(optim, opt['train.optim_method']),
-        optim_config = { 'lr': opt['train.learning_rate'],
-                         'weight_decay': opt['train.weight_decay'] },
-        max_epoch = opt['train.epochs']
+        model=model,
+        loader=train_loader,
+        optim_method=getattr(optim, opt['train.optim_method']),  # Default is Adam
+        optim_config={'lr': opt['train.learning_rate'],
+                        'weight_decay': opt['train.weight_decay']},  # Default is lr=0.001, weight decay = 0 -> can tune these
+        max_epoch=opt['train.epochs']  # Default is 10000
     )

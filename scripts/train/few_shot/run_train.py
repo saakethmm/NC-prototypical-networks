@@ -12,11 +12,11 @@ default_split = 'vinyals'
 parser.add_argument('--data.split', type=str, default=default_split, metavar='SP',
                     help="split name (default: {:s})".format(default_split))
 parser.add_argument('--data.way', type=int, default=60, metavar='WAY',
-                    help="number of classes per episode (default: 60)")
+                    help="number of classes per episode (default: 60)") # For support set during training (# of classes)
 parser.add_argument('--data.shot', type=int, default=5, metavar='SHOT',
-                    help="number of support examples per class (default: 5)")
+                    help="number of support examples per class (default: 5)") # # of examples per class during training
 parser.add_argument('--data.query', type=int, default=5, metavar='QUERY',
-                    help="number of query examples per class (default: 5)")
+                    help="number of query examples per class (default: 5)") # # of examples to test on for query
 parser.add_argument('--data.test_way', type=int, default=5, metavar='TESTWAY',
                     help="number of classes per episode in test. 0 means same as data.way (default: 5)")
 parser.add_argument('--data.test_shot', type=int, default=0, metavar='TESTSHOT',
@@ -58,7 +58,7 @@ parser.add_argument('--train.patience', type=int, default=200, metavar='PATIENCE
                     help='number of epochs to wait before validation improvement (default: 1000)')
 
 # log args
-default_fields = 'loss,acc'
+default_fields = 'loss,acc,NC1,NC2,NC3'
 parser.add_argument('--log.fields', type=str, default=default_fields, metavar='FIELDS',
                     help="fields to monitor during training (default: {:s})".format(default_fields))
 default_exp_dir = 'results'

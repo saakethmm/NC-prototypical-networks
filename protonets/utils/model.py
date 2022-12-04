@@ -4,8 +4,8 @@ from protonets.utils import filter_opt
 from protonets.models import get_model
 
 def load(opt):
-    model_opt = filter_opt(opt, 'model')
-    model_name = model_opt['model_name']
+    model_opt = filter_opt(opt, 'model')  # Filter out arguments to extract model details (x_dim, hidden_dim, z_dim)
+    model_name = model_opt['model_name']  # Get model name - default is protonet_conv
 
     del model_opt['model_name']
 
