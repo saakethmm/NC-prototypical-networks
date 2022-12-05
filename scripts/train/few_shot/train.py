@@ -8,7 +8,6 @@ import numpy as np
 import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler 
-import torchvision
 import torchnet as tnt
 
 from protonets.engine import Engine
@@ -34,7 +33,7 @@ def main(opt):
 
     torch.manual_seed(1234)
     if opt['data.cuda']:
-        torch.cuda.manual_seed(1234)
+        torch.manual_seed(1234)
 
     if opt['data.trainval']:
         data = data_utils.load(opt, ['trainval'])  # Load dataset

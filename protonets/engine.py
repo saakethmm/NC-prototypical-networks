@@ -50,7 +50,8 @@ class Engine(object):
                 state['batch'] += 1
                 self.hooks['on_update'](state)
 
-            # Calculate neural collapse metrics at each epoch (after all training data gradient updates taken)
+            # Calculate neural collapse metrics after each epoch (on_end_epoch) using model parameters to calculate NC metrics
+
             state['epoch'] += 1
             state['batch'] = 0  # Equals batch-size before resetting (number of samples seen in one epoch)
             self.hooks['on_end_epoch'](state)

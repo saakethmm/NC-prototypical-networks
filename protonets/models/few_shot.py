@@ -22,8 +22,8 @@ class Protonet(nn.Module):
         self.encoder = encoder
 
     def loss(self, sample):
-        xs = Variable(sample['xs']) # support
-        xq = Variable(sample['xq']) # query
+        xs = Variable(sample['xs'])  # support
+        xq = Variable(sample['xq'])  # query
 
         n_class = xs.size(0)
         assert xq.size(0) == n_class

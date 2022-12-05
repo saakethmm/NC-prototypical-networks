@@ -1,4 +1,9 @@
 import argparse
+import os
+import sys
+
+curr_dir = os.getcwd()
+sys.path.append("/Users/saakethm/Documents/Courses/Fall_2022/EECS_598/Project/NC-prototypical-networks/")
 
 from train import main
 
@@ -58,7 +63,7 @@ parser.add_argument('--train.patience', type=int, default=200, metavar='PATIENCE
                     help='number of epochs to wait before validation improvement (default: 1000)')
 
 # log args
-default_fields = 'loss,acc,NC1,NC2,NC3'
+default_fields = 'loss,acc' # 'loss,acc,NC1,NC2,NC3'
 parser.add_argument('--log.fields', type=str, default=default_fields, metavar='FIELDS',
                     help="fields to monitor during training (default: {:s})".format(default_fields))
 default_exp_dir = 'results'
@@ -66,5 +71,6 @@ parser.add_argument('--log.exp_dir', type=str, default=default_exp_dir, metavar=
                     help="directory where experiments should be saved (default: {:s})".format(default_exp_dir))
 
 args = vars(parser.parse_args())
+
 
 main(args)
