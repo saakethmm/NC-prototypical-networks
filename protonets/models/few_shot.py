@@ -45,16 +45,15 @@ class Protonet(nn.Module):
         z_dim = z.size(-1)
 
         # Only consider first N_support * K_support images, viewed as (N_support, K_support, 64)
-        zs_proto = z[:n_class*n_support].view(n_class, n_support, z_dim)
-        zs_proto_mean = zs_proto.mean(1)
+        zs_proto_mean = z[:n_class*n_support].view(n_class, n_support, z_dim).mean(1)  # Not detached
+        zq = z[n_class*n_support:]  # Not detached
 
-        zq = z[n_class*n_support:]
-        zq_proto = zq.view(n_class, n_query, z_dim)
+        zs_proto = z[:n_class * n_support].view(n_class, n_support, z_dim).detach()
+        zq_proto = zq.view(n_class, n_query, z_dim).detach()
         zq_proto_mean = zq_proto.mean(1)
 
-        # TODO: Check
-        nc1_zs = nc.compute_nc1(zs_proto, zs_proto_mean)
-        nc2_zs = nc.compute_nc2(zs_proto_mean)
+        nc1_zs = nc.compute_nc1(zs_proto, zs_proto_mean.detach())
+        nc2_zs = nc.compute_nc2(zs_proto_mean.detach())
 
         nc1_zq = nc.compute_nc1(zq_proto, zq_proto_mean)
         nc2_zq = nc.compute_nc2(zq_proto_mean)
