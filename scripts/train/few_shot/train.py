@@ -25,7 +25,7 @@ def main(opt):
         json.dump(opt, f)  # Dump the contents of the argument parsing to a JSON in the 'results' folder
         f.write('\n')
 
-    trace_file = os.path.join(opt['log.exp_dir'], 'trace.txt')
+    trace_file = os.path.join(opt['log.exp_dir'], 'trace.json')
 
     # Postprocess arguments
     opt['model.x_dim'] = list(map(int, opt['model.x_dim'].split(',')))  # Maps input x to list of ints '1,28,28' -> [1, 28, 28]
@@ -52,9 +52,6 @@ def main(opt):
     engine = Engine()
 
     meters = { 'train': { field: tnt.meter.AverageValueMeter() for field in opt['log.fields'] } }
-
-    # TODO: Figure out where metrics are calculated and stored so NC1, 2, 3 can be properly calculated (based on few_shot.py/model)
-    # TODO: Store these in the same way loss, acc are stored -> easy to plot
 
     if val_loader is not None:
         meters['val'] = { field: tnt.meter.AverageValueMeter() for field in opt['log.fields'] }
@@ -111,7 +108,7 @@ def main(opt):
             else:
                 hook_state['wait'] += 1
 
-                if hook_state['wait'] > opt['train.patience']:
+                if hook_state['wait'] > opt['train.patience']:  # Early stopping...
                     print("==> patience {:d} exceeded".format(opt['train.patience']))
                     state['stop'] = True
         else:
