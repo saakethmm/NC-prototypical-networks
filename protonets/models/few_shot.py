@@ -7,6 +7,7 @@ from torch.autograd import Variable
 from protonets.models import register_model
 
 from .utils import euclidean_dist
+import protonets.utils.validate_nc as nc
 
 class Flatten(nn.Module):
     def __init__(self):
@@ -22,13 +23,13 @@ class Protonet(nn.Module):
         self.encoder = encoder
 
     def loss(self, sample):
-        xs = Variable(sample['xs'])  # support
-        xq = Variable(sample['xq'])  # query
+        xs = Variable(sample['xs'])  # support, shape: (N_support, K_support, C_in, H, W)
+        xq = Variable(sample['xq'])  # query, shape: (N_query, K_query, C_in, H, W)
 
-        n_class = xs.size(0)
-        assert xq.size(0) == n_class
-        n_support = xs.size(1)
-        n_query = xq.size(1)
+        n_class = xs.size(0)  # N_support
+        assert xq.size(0) == n_class  # N_support = N_query
+        n_support = xs.size(1)  # K_support
+        n_query = xq.size(1)  # K_query
 
         target_inds = torch.arange(0, n_class).view(n_class, 1, 1).expand(n_class, n_query, 1).long()
         target_inds = Variable(target_inds, requires_grad=False)
@@ -36,16 +37,31 @@ class Protonet(nn.Module):
         if xq.is_cuda:
             target_inds = target_inds.cuda()
 
+        # Shape: (N_support * K_support + N_support * K_query, C_in, H, W)
         x = torch.cat([xs.view(n_class * n_support, *xs.size()[2:]),
                        xq.view(n_class * n_query, *xq.size()[2:])], 0)
 
-        z = self.encoder.forward(x)
+        z = self.encoder.forward(x)  # Flattened so shape is (N_support * K_support + N_support * K_query, 64)
         z_dim = z.size(-1)
 
-        z_proto = z[:n_class*n_support].view(n_class, n_support, z_dim).mean(1)
-        zq = z[n_class*n_support:]
+        # Only consider first N_support * K_support images, viewed as (N_support, K_support, 64)
+        zs_proto = z[:n_class*n_support].view(n_class, n_support, z_dim)
+        zs_proto_mean = zs_proto.mean(1)
 
-        dists = euclidean_dist(zq, z_proto)
+        zq = z[n_class*n_support:]
+        zq_proto = zq.view(n_class, n_query, z_dim)
+        zq_proto_mean = zq_proto.mean(1)
+
+        # TODO: Check
+        nc1_zs = nc.compute_nc1(zs_proto, zs_proto_mean)
+        nc2_zs = nc.compute_nc2(zs_proto_mean)
+
+        nc1_zq = nc.compute_nc1(zq_proto, zq_proto_mean)
+        nc2_zq = nc.compute_nc2(zq_proto_mean)
+
+        # One reason we use prototypical networks is that the feature vectors produced can be
+        # easily built upon to find NC metrics
+        dists = euclidean_dist(zq, zs_proto_mean)
 
         log_p_y = F.log_softmax(-dists, dim=1).view(n_class, n_query, -1)
 
@@ -56,7 +72,11 @@ class Protonet(nn.Module):
 
         return loss_val, {
             'loss': loss_val.item(),
-            'acc': acc_val.item()
+            'acc': acc_val.item(),
+            'NC1_support': nc1_zs.item(),
+            'NC2_support': nc2_zs.item(),
+            'NC1_query': nc1_zq.item(),
+            'NC2_query': nc2_zq.item()
         }
 
 @register_model('protonet_conv')

@@ -3,19 +3,20 @@ import json
 import numpy as np
 
 def extract_meter_values(meters):
-    ret = { }
+    ret = {}
 
-    for split in meters.keys():
-        ret[split] = { }
-        for field,meter in meters[split].items():
-            ret[split][field] = meter.value()[0]
+    for split in meters.keys():  # train or validation
+        ret[split] = {}
+        for field, meter in meters[split].items():  # field is loss, acc, NC1, ... &
+            ret[split][field] = meter.value()[0]   # gets value of meter (essentially average in this case of all of
+                                                   # the collected values throughout all of the episodes
 
     return ret
 
 def render_meter_values(meter_values):
     field_info = []
     for split in meter_values.keys():
-        for field,val in meter_values[split].items():
+        for field, val in meter_values[split].items():
             field_info.append("{:s} {:s} = {:0.6f}".format(split, field, val))
 
     return ', '.join(field_info)

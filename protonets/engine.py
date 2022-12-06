@@ -33,11 +33,13 @@ class Engine(object):
 
             state['epoch_size'] = len(state['loader'])
 
+            # Iterating over each episode
             for sample in tqdm(state['loader'], desc="Epoch {:d} train".format(state['epoch'] + 1)):
                 state['sample'] = sample
                 self.hooks['on_sample'](state)
 
                 state['optimizer'].zero_grad()
+                breakpoint()
                 loss, state['output'] = state['model'].loss(state['sample'])
                 self.hooks['on_forward'](state)
 
@@ -48,9 +50,7 @@ class Engine(object):
 
                 state['t'] += 1
                 state['batch'] += 1
-                self.hooks['on_update'](state)
-
-            # Calculate neural collapse metrics after each epoch (on_end_epoch) using model parameters to calculate NC metrics
+                self.hooks['on_update'](state)  # Adds values of metrics to corresponding loss, acc, NC meters per episode
 
             state['epoch'] += 1
             state['batch'] = 0  # Equals batch-size before resetting (number of samples seen in one epoch)
