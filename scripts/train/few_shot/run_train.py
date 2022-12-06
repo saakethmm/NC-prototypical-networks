@@ -63,7 +63,7 @@ parser.add_argument('--train.patience', type=int, default=200, metavar='PATIENCE
                     help='number of epochs to wait before validation improvement (default: 1000)')
 
 # log args
-default_fields = 'loss,acc' # 'loss,acc,NC1,NC2,NC3'
+default_fields = 'loss,acc'
 parser.add_argument('--log.fields', type=str, default=default_fields, metavar='FIELDS',
                     help="fields to monitor during training (default: {:s})".format(default_fields))
 default_exp_dir = 'results'

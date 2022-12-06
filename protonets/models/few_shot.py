@@ -73,10 +73,10 @@ class Protonet(nn.Module):
         return loss_val, {
             'loss': loss_val.item(),
             'acc': acc_val.item(),
-            'NC1_support': nc1_zs.item(),
-            'NC2_support': nc2_zs.item(),
-            'NC1_query': nc1_zq.item(),
-            'NC2_query': nc2_zq.item()
+            'nc1_support': nc1_zs.item(),
+            'nc2_support': nc2_zs.item(),
+            'nc1_query': nc1_zq.item(),
+            'nc2_query': nc2_zq.item()
         }
 
 @register_model('protonet_conv')

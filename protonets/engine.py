@@ -31,7 +31,7 @@ class Engine(object):
 
             self.hooks['on_start_epoch'](state)
 
-            state['epoch_size'] = len(state['loader'])
+            state['epoch_size'] = len(state['loader'])  # Number of episodes in one epoch
 
             # Iterating over each episode
             for sample in tqdm(state['loader'], desc="Epoch {:d} train".format(state['epoch'] + 1)):
@@ -39,7 +39,6 @@ class Engine(object):
                 self.hooks['on_sample'](state)
 
                 state['optimizer'].zero_grad()
-                breakpoint()
                 loss, state['output'] = state['model'].loss(state['sample'])
                 self.hooks['on_forward'](state)
 
