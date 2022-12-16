@@ -12,6 +12,7 @@ class Engine(object):
     def train(self, **kwargs):
         state = {
             'model': kwargs['model'],
+            'model_name': kwargs['model_name'],
             'loader': kwargs['loader'],
             'optim_method': kwargs['optim_method'],
             'optim_config': kwargs['optim_config'],
@@ -39,7 +40,7 @@ class Engine(object):
                 self.hooks['on_sample'](state)
 
                 state['optimizer'].zero_grad()
-                loss, state['output'] = state['model'].loss(state['sample'])
+                loss, state['output'] = state['model'].loss(state['sample'], state['model_name'])
                 self.hooks['on_forward'](state)
 
                 loss.backward()  # Calculate gradients

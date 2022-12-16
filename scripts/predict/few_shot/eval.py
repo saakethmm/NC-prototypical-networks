@@ -60,5 +60,6 @@ def main(opt):
     model_utils.evaluate(model, data['test'], meters, desc="test")
 
     for field,meter in meters.items():
-        mean, std = meter.value()
+        mean, std = meter.value()  # Should average all the mean metrics for all episodes (doesn't make sense to
+                                    # run several epochs since no training is happening)
         print("test {:s}: {:0.6f} +/- {:0.6f}".format(field, mean, 1.96 * std / math.sqrt(data_opt['data.test_episodes'])))

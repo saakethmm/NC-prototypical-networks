@@ -55,7 +55,7 @@ def load_class_images(d):
 
         for sample in loader:
             OMNIGLOT_CACHE[d['class']] = sample['data']
-            break # only need one sample because batch size equal to dataset length
+            break  # only need one sample because batch size equal to dataset length
 
     return { 'class': d['class'], 'data': OMNIGLOT_CACHE[d['class']] }
 

@@ -37,6 +37,7 @@ def main(opt):
 
     if opt['data.trainval']:
         data = data_utils.load(opt, ['trainval'])  # Load dataset
+        # Called either by flag or when running run_trainval.py (used for training on training+validation)
         train_loader = data['trainval']
         val_loader = None
     else:
@@ -121,6 +122,7 @@ def main(opt):
 
     engine.train(
         model=model,
+        model_name=opt['model.model_name'],
         loader=train_loader,
         optim_method=getattr(optim, opt['train.optim_method']),  # Default is Adam
         optim_config={'lr': opt['train.learning_rate'],

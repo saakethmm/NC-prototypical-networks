@@ -9,6 +9,8 @@ from protonets.models import register_model
 from .utils import euclidean_dist
 import protonets.utils.validate_nc as nc
 
+from protonets.models.resnet import ResNet18, ResNet34, ResNet50
+
 class Flatten(nn.Module):
     def __init__(self):
         super(Flatten, self).__init__()
@@ -22,7 +24,7 @@ class Protonet(nn.Module):
         
         self.encoder = encoder
 
-    def loss(self, sample):
+    def loss(self, sample, model_name):
         xs = Variable(sample['xs'])  # support, shape: (N_support, K_support, C_in, H, W)
         xq = Variable(sample['xq'])  # query, shape: (N_query, K_query, C_in, H, W)
 
@@ -40,6 +42,9 @@ class Protonet(nn.Module):
         # Shape: (N_support * K_support + N_support * K_query, C_in, H, W)
         x = torch.cat([xs.view(n_class * n_support, *xs.size()[2:]),
                        xq.view(n_class * n_query, *xq.size()[2:])], 0)
+
+        if model_name != 'protonet_conv':
+            x = x.repeat(1, 3, 1, 1)  # Clever solution to make BW image -> RGB
 
         z = self.encoder.forward(x)  # Flattened so shape is (N_support * K_support + N_support * K_query, 64)
         z_dim = z.size(-1)
@@ -101,3 +106,11 @@ def load_protonet_conv(**kwargs):
     )
 
     return Protonet(encoder)  # Returns an initialized prototypical network to be trained
+
+@register_model('resnet18')
+def load_resnet18(**kwargs):
+    return Protonet(ResNet18())
+
+@register_model('resnet34')
+def load_resnet18(**kwargs):
+    return Protonet(ResNet34())
