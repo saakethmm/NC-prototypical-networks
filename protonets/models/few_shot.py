@@ -114,3 +114,7 @@ def load_resnet18(**kwargs):
 @register_model('resnet34')
 def load_resnet34(**kwargs):
     return Protonet(ResNet34())
+
+@register_model('resnet50')
+def load_resnet50(**kwargs):
+    return Protonet(ResNet50())
