@@ -57,7 +57,8 @@ def main(opt):
 
     meters = { field: tnt.meter.AverageValueMeter() for field in model_opt['log.fields'] }
 
-    model_utils.evaluate(model, data['test'], meters, desc="test")
+    model_name = model_opt['model.model_name']
+    model_utils.evaluate(model, model_name, data['test'], meters, desc="test")
 
     for field,meter in meters.items():
         mean, std = meter.value()  # Should average all the mean metrics for all episodes (doesn't make sense to

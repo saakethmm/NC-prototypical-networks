@@ -11,7 +11,7 @@ def load(opt):
 
     return get_model(model_name, model_opt)
 
-def evaluate(model, data_loader, meters, desc=None):
+def evaluate(model, model_name, data_loader, meters, desc=None):
     model.eval()
 
     for field, meter in meters.items():
@@ -21,7 +21,7 @@ def evaluate(model, data_loader, meters, desc=None):
         data_loader = tqdm(data_loader, desc=desc)
 
     for sample in data_loader:
-        _, output = model.loss(sample)
+        _, output = model.loss(sample, model_name)
         for field, meter in meters.items():
             meter.add(output[field])
 

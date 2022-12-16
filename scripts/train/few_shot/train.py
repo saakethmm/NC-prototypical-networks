@@ -84,6 +84,7 @@ def main(opt):
 
         if val_loader is not None:
             model_utils.evaluate(state['model'],
+                                 state['model_name'],
                                  val_loader,
                                  meters['val'],
                                  desc="Epoch {:d} valid".format(state['epoch']))
